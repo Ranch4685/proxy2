@@ -56,29 +56,6 @@ const sameUserPredicate = (incoming: Request) => (queued: Request) => {
 };
 
 export function enqueue(req: Request) {
-  const enqueuedRequestCount = queue.filter(sameUserPredicate(req)).length;
-  let isGuest = req.user?.token === undefined;
-
-  // All Agnai.chat requests come from the same IP, so we allow them to have
-  // more spots in the queue. Can't make it unlimited because people will
-  // intentionally abuse it.
-  // Authenticated users always get a single spot in the queue.
-  const maxConcurrentQueuedRequests =
-    isGuest && req.ip === AGNAI_DOT_CHAT_IP
-      ? AGNAI_CONCURRENCY_LIMIT
-      : USER_CONCURRENCY_LIMIT;
-  if (enqueuedRequestCount >= maxConcurrentQueuedRequests) {
-    if (req.ip === AGNAI_DOT_CHAT_IP) {
-      // Re-enqueued requests are not counted towards the limit since they
-      // already made it through the queue once.
-      if (req.retryCount === 0) {
-        throw new Error("Too many agnai.chat requests are already queued");
-      }
-    } else {
-      throw new Error("Your IP or token already has a request in the queue");
-    }
-  }
-
   queue.push(req);
   req.queueOutTime = 0;
 
@@ -210,7 +187,7 @@ function processQueue() {
       req.proceed();
     }
   });
-  setTimeout(processQueue, 50);
+  setTimeout(processQueue, 15);
 }
 
 /**
