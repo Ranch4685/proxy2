@@ -43,13 +43,13 @@ export interface AnthropicKey extends Key {
  * Upon being rate limited, a key will be locked out for this many milliseconds
  * while we wait for other concurrent requests to finish.
  */
-const RATE_LIMIT_LOCKOUT = 2000;
+const RATE_LIMIT_LOCKOUT = 100;
 /**
  * Upon assigning a key, we will wait this many milliseconds before allowing it
  * to be used again. This is to prevent the queue from flooding a key with too
  * many requests while we wait to learn whether previous ones succeeded.
  */
-const KEY_REUSE_DELAY = 500;
+const KEY_REUSE_DELAY = 100;
 
 export class AnthropicKeyProvider implements KeyProvider<AnthropicKey> {
   readonly service = "anthropic";
