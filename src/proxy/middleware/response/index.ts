@@ -267,7 +267,7 @@ const handleUpstreamErrors: ProxyResHandlerWithBody = async (
     } else if (req.outboundApi === "anthropic") {
       maybeHandleMissingPreambleError(req, errorPayload);
     }
-  } else if (statusCode === 401) {
+  } else if (statusCode === 401 || statusCode === 403) {
     // Key is invalid or was revoked
     keyPool.disable(req.key!, "revoked");
     errorPayload.proxy_note = `API key is invalid or revoked. ${tryAgainMessage}`;
